@@ -2,40 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ilan.lol – Vids</title>
-  <link rel="stylesheet" href="style.css">
+  <meta http-equiv="refresh" content="0; url=./vids/" />
+  <title>Redirecting to Videos…</title>
 </head>
 <body>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="pics.html">Pics</a>
-    <a href="vids.html">Vids</a>
-  </nav>
-  <div class="content">
-    <h1>Video Gallery</h1>
-    <p>Add your video files to the <code>vids</code> folder and they will appear here.</p>
-    <div class="gallery" id="gallery"></div>
-    <script>
-      // Dynamically load all video files from the ./vids/ folder.
-      // Works when the site is served via a local web server.
-      fetch('./vids/')
-        .then(r => r.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const links = [...doc.querySelectorAll('a')].map(a => a.getAttribute('href'));
-          const videos = links.filter(name => /\.(mp4|webm|ogg)$/i.test(name));
-          const gallery = document.getElementById('gallery');
-          videos.forEach(name => {
-            const vid = document.createElement('video');
-            vid.controls = true;
-            vid.src = `vids/${name}`;
-            gallery.appendChild(vid);
-          });
-        })
-        .catch(err => console.error('Could not load video gallery:', err));
-    </script>
-  </div>
+  <p>Redirecting to the videos folder…</p>
 </body>
 </html>

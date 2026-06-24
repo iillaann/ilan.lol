@@ -2,40 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ilan.lol – Pics</title>
-  <link rel="stylesheet" href="style.css">
+  <meta http-equiv="refresh" content="0; url=./pics/" />
+  <title>Redirecting to Pictures…</title>
 </head>
 <body>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="pics.html">Pics</a>
-    <a href="vids.html">Vids</a>
-  </nav>
-  <div class="content">
-    <h1>Picture Gallery</h1>
-    <p>Add your images to the <code>pics</code> folder and they will appear here.</p>
-    <div class="gallery" id="gallery"></div>
-    <script>
-      // Dynamically load all image files from the ./pics/ folder.
-      // Works when the site is served via a local web server (e.g., python -m http.server).
-      fetch('./pics/')
-        .then(r => r.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const links = [...doc.querySelectorAll('a')].map(a => a.getAttribute('href'));
-          const images = links.filter(name => /\.(jpe?g|png|gif|webp)$/i.test(name));
-          const gallery = document.getElementById('gallery');
-          images.forEach(name => {
-            const img = document.createElement('img');
-            img.src = `pics/${name}`;
-            img.alt = name;
-            gallery.appendChild(img);
-          });
-        })
-        .catch(err => console.error('Could not load image gallery:', err));
-    </script>
-  </div>
+  <p>Redirecting to the pictures folder…</p>
 </body>
 </html>
