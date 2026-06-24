@@ -15,11 +15,27 @@
   <div class="content">
     <h1>Picture Gallery</h1>
     <p>Add your images to the <code>pics</code> folder and they will appear here.</p>
-    <div class="gallery">
-      <!-- Example placeholder images; replace with your own -->
-      <img src="pics/example1.jpg" alt="Example 1" />
-      <img src="pics/example2.jpg" alt="Example 2" />
-    </div>
+    <div class="gallery" id="gallery"></div>
+    <script>
+      // Dynamically load all image files from the ./pics/ folder.
+      // Works when the site is served via a local web server (e.g., python -m http.server).
+      fetch('./pics/')
+        .then(r => r.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const links = [...doc.querySelectorAll('a')].map(a => a.getAttribute('href'));
+          const images = links.filter(name => /\.(jpe?g|png|gif|webp)$/i.test(name));
+          const gallery = document.getElementById('gallery');
+          images.forEach(name => {
+            const img = document.createElement('img');
+            img.src = `pics/${name}`;
+            img.alt = name;
+            gallery.appendChild(img);
+          });
+        })
+        .catch(err => console.error('Could not load image gallery:', err));
+    </script>
   </div>
 </body>
 </html>
