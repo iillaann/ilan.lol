@@ -14,14 +14,17 @@
   </nav>
   <audio id="bgm" src="tuffbackgroundmusic.mp3" loop></audio>
   <script>
-    // Attempt to autoplay background music (may require user interaction on some browsers)
+    // Play background music after first user interaction (click or key press)
     const audio = document.getElementById('bgm');
-    const playMusic = () => { audio.play().catch(() => {}); };
-    // Try immediately
-    playMusic();
-    // Fallback on first user interaction
-    document.addEventListener('click', playMusic, {once:true});
-    document.addEventListener('keydown', playMusic, {once:true});
+    const startMusic = () => {
+      audio.play().catch(() => {});
+      // Remove listeners after first successful play
+      document.removeEventListener('click', startMusic);
+      document.removeEventListener('keydown', startMusic);
+    };
+    // Attach listeners – browsers block autoplay, so we wait for interaction
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
   </script>
   <div class="content">
     <h1>Welcome to ilan.lol</h1>
