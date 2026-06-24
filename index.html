@@ -12,6 +12,17 @@
     <a href="pics.html">Pics</a>
     <a href="vids.html">Vids</a>
   </nav>
+  <audio id="bgm" src="tuffbackgroundmusic.mp3" loop></audio>
+  <script>
+    // Attempt to autoplay background music (may require user interaction on some browsers)
+    const audio = document.getElementById('bgm');
+    const playMusic = () => { audio.play().catch(() => {}); };
+    // Try immediately
+    playMusic();
+    // Fallback on first user interaction
+    document.addEventListener('click', playMusic, {once:true});
+    document.addEventListener('keydown', playMusic, {once:true});
+  </script>
   <div class="content">
     <h1>Welcome to ilan.lol</h1>
     <p>This is the main page. You can edit the description later.</p>
