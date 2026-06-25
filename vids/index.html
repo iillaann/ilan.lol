@@ -2,10 +2,145 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=./vids/" />
-  <title>Redirecting to Videos…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vids — ilan.lol</title>
+  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <p>Redirecting to the videos folder…</p>
+  <nav>
+    <a href="../index.html">Home</a>
+    <a href="../pics/index.html">Pics</a>
+    <a href="index.html">Vids</a>
+  </nav>
+
+  <audio id="bgm" src="../tuffbackgroundmusic.mp3" loop></audio>
+  <script>
+    const audio = document.getElementById('bgm');
+    const startMusic = () => {
+      audio.play().catch(() => {});
+      document.removeEventListener('click', startMusic);
+      document.removeEventListener('keydown', startMusic);
+    };
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
+  </script>
+
+  <div class="content">
+    <h1>Vids</h1>
+    <p class="gallery-count" id="vidCount">Loading...</p>
+
+    <div class="gallery" id="vidGallery">
+      <!-- Videos will be injected here -->
+    </div>
+  </div>
+
+  <!-- Video Modal -->
+  <div class="lightbox video-lightbox" id="videoLightbox" role="dialog" aria-modal="true" aria-label="Video player">
+    <button class="lightbox-close" id="videoLightboxClose" aria-label="Close">×</button>
+    <video id="videoPlayer" controls playsinline></video>
+    <p class="lightbox-caption" id="videoCaption"></p>
+  </div>
+
+  <script>
+    const videos = [
+      { src: "vids/Download(11).mp4", name: "Download (11)" },
+      { src: "vids/Download(13).mp4", name: "Download (13)" }
+    ];
+
+    const gallery = document.getElementById('vidGallery');
+    const countEl = document.getElementById('vidCount');
+
+    videos.forEach((vid, i) => {
+      const item = document.createElement('div');
+      item.className = 'gallery-item video-item';
+      item.dataset.index = i;
+      item.tabIndex = 0;
+      item.ariaLabel = `Play ${vid.name}`;
+
+      const video = document.createElement('video');
+      video.src = vid.src;
+      video.muted = true;
+      video.preload = 'metadata';
+      video.playsInline = true;
+      item.appendChild(video);
+
+      const overlay = document.createElement('div');
+      overlay.className = 'video-overlay';
+      overlay.innerHTML = `
+        <svg class="play-icon" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true">
+          <path fill="currentColor" d="M8 5v14l11-7z"/>
+        </svg>
+        <span class="video-name">${vid.name}</span>
+      `;
+      item.appendChild(overlay);
+
+      // Hover preview
+      item.addEventListener('mouseenter', () => {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      });
+      item.addEventListener('mouseleave', () => {
+        video.pause();
+        video.currentTime = 0;
+      });
+
+      gallery.appendChild(item);
+    });
+
+    countEl.textContent = `${videos.length} video${videos.length !== 1 ? 's' : ''}`;
+
+    // Video lightbox
+    const lightbox = document.getElementById('videoLightbox');
+    const player = document.getElementById('videoPlayer');
+    const caption = document.getElementById('videoCaption');
+    const closeBtn = document.getElementById('videoLightboxClose');
+
+    function openVideo(index) {
+      const vid = videos[index];
+      player.src = vid.src;
+      caption.textContent = vid.name;
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      player.play().catch(() => {});
+    }
+
+    function closeVideo() {
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+      player.pause();
+      player.src = '';
+    }
+
+    gallery.addEventListener('click', (e) => {
+      const item = e.target.closest('.video-item');
+      if (item) {
+        openVideo(parseInt(item.dataset.index, 10));
+      }
+    });
+
+    gallery.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.video-item')) {
+        e.preventDefault();
+        openVideo(parseInt(e.target.closest('.video-item').dataset.index, 10));
+      }
+    });
+
+    closeBtn.addEventListener('click', closeVideo);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeVideo();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') closeVideo();
+    });
+
+    // Pause video when lightbox closes
+    lightbox.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'opacity' && !lightbox.classList.contains('open')) {
+        player.pause();
+      }
+    });
+  </script>
 </body>
 </html>
