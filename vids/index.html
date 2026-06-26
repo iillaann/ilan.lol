@@ -1,146 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vids — ilan.lol</title>
+  <meta name="description" content="Video collection on ilan.lol — random clips and downloads.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <nav>
-    <a href="../index.html">Home</a>
-    <a href="../pics/index.html">Pics</a>
-    <a href="index.html">Vids</a>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">ilan.lol</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../pics/index.html">Pics</a></li>
+      <li><a href="index.html" class="active">Vids</a></li>
+    </ul>
   </nav>
 
-  <audio id="bgm" src="../tuffbackgroundmusic.mp3" loop></audio>
-  <script>
-    const audio = document.getElementById('bgm');
-    const startMusic = () => {
-      audio.play().catch(() => {});
-      document.removeEventListener('click', startMusic);
-      document.removeEventListener('keydown', startMusic);
-    };
-    document.addEventListener('click', startMusic);
-    document.addEventListener('keydown', startMusic);
-  </script>
-
-  <div class="content">
+  <!-- Page Header -->
+  <div class="page-header">
     <h1>Vids</h1>
-    <p class="gallery-count" id="vidCount">Loading...</p>
+    <p id="vidCount">Loading…</p>
+  </div>
 
-    <div class="gallery" id="vidGallery">
-      <!-- Videos will be injected here -->
+  <!-- Videos -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="video-grid" id="vidGallery"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 <a href="../index.html">ilan.lol</a></p>
+  </footer>
+
+  <!-- Music Player -->
+  <div class="player" id="player">
+    <div class="player-info">
+      <div class="player-note">♪</div>
+      <div class="player-meta">
+        <div class="player-song">Tuff Background Music</div>
+        <div class="player-artist">Unknown Artist</div>
+      </div>
+    </div>
+    <button class="player-play" id="btnPlay" aria-label="Play">
+      <svg id="iconPlay" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+    </button>
+    <div class="player-seek">
+      <span class="player-time" id="curTime">0:00</span>
+      <div class="seek-wrap" id="seekWrap">
+        <div class="seek-track">
+          <div class="seek-fill" id="seekFill"></div>
+        </div>
+        <div class="seek-thumb" id="seekThumb"></div>
+        <input type="range" class="seek-input" id="seekBar" min="0" max="1000" value="0" aria-label="Seek">
+      </div>
+      <span class="player-time" id="durTime">0:00</span>
+    </div>
+    <div class="player-vol">
+      <button class="player-mute" id="btnMute" aria-label="Mute">
+        <svg id="iconVol" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+      <div class="vol-wrap" id="volWrap">
+        <div class="vol-track">
+          <div class="vol-fill" id="volFill"></div>
+        </div>
+        <input type="range" class="vol-input" id="volBar" min="0" max="100" value="70" aria-label="Volume">
+      </div>
     </div>
   </div>
 
-  <!-- Video Modal -->
-  <div class="lightbox video-lightbox" id="videoLightbox" role="dialog" aria-modal="true" aria-label="Video player">
-    <button class="lightbox-close" id="videoLightboxClose" aria-label="Close">×</button>
-    <video id="videoPlayer" controls playsinline></video>
-    <p class="lightbox-caption" id="videoCaption"></p>
-  </div>
+  <audio id="bgm" src="../tuffbackgroundmusic.mp3" loop preload="metadata"></audio>
 
   <script>
+    /* ---- Video Data ---- */
     const videos = [
       { src: "vids/Download(11).mp4", name: "Download (11)" },
       { src: "vids/Download(13).mp4", name: "Download (13)" }
     ];
 
-    const gallery = document.getElementById('vidGallery');
+    /* ---- Build Video Grid ---- */
+    const grid = document.getElementById('vidGallery');
     const countEl = document.getElementById('vidCount');
 
     videos.forEach((vid, i) => {
-      const item = document.createElement('div');
-      item.className = 'gallery-item video-item';
-      item.dataset.index = i;
-      item.tabIndex = 0;
-      item.ariaLabel = `Play ${vid.name}`;
+      const card = document.createElement('div');
+      card.className = 'video-card reveal';
+      card.dataset.index = i;
 
       const video = document.createElement('video');
       video.src = vid.src;
       video.muted = true;
       video.preload = 'metadata';
       video.playsInline = true;
-      item.appendChild(video);
+      card.appendChild(video);
 
       const overlay = document.createElement('div');
       overlay.className = 'video-overlay';
+      overlay.id = 'overlay-' + i;
       overlay.innerHTML = `
-        <svg class="play-icon" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true">
-          <path fill="currentColor" d="M8 5v14l11-7z"/>
-        </svg>
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        </div>
         <span class="video-name">${vid.name}</span>
       `;
-      item.appendChild(overlay);
+      card.appendChild(overlay);
 
       // Hover preview
-      item.addEventListener('mouseenter', () => {
+      card.addEventListener('mouseenter', () => {
         video.currentTime = 0;
         video.play().catch(() => {});
       });
-      item.addEventListener('mouseleave', () => {
+      card.addEventListener('mouseleave', () => {
         video.pause();
         video.currentTime = 0;
       });
 
-      gallery.appendChild(item);
+      // Click to play with controls
+      overlay.addEventListener('click', () => {
+        overlay.classList.add('hidden');
+        video.muted = false;
+        video.controls = true;
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      });
+
+      // Show overlay again when video ends
+      video.addEventListener('ended', () => {
+        overlay.classList.remove('hidden');
+        video.controls = false;
+        video.muted = true;
+        video.currentTime = 0;
+      });
+
+      // Also show overlay when paused by user after initial play
+      video.addEventListener('pause', () => {
+        if (video.ended) return;
+        // Delay to prevent flicker on scrub
+        setTimeout(() => {
+          if (video.paused && !video.ended && video.currentTime > 0) {
+            // Keep controls visible while paused mid-play
+          }
+        }, 100);
+      });
+
+      grid.appendChild(card);
     });
 
     countEl.textContent = `${videos.length} video${videos.length !== 1 ? 's' : ''}`;
 
-    // Video lightbox
-    const lightbox = document.getElementById('videoLightbox');
-    const player = document.getElementById('videoPlayer');
-    const caption = document.getElementById('videoCaption');
-    const closeBtn = document.getElementById('videoLightboxClose');
+    /* ---- Music Player ---- */
+    const audio = document.getElementById('bgm');
+    const btnPlay = document.getElementById('btnPlay');
+    const iconPlay = document.getElementById('iconPlay');
+    const seekBar = document.getElementById('seekBar');
+    const seekFill = document.getElementById('seekFill');
+    const seekThumb = document.getElementById('seekThumb');
+    const curTime = document.getElementById('curTime');
+    const durTime = document.getElementById('durTime');
+    const btnMute = document.getElementById('btnMute');
+    const iconVol = document.getElementById('iconVol');
+    const volBar = document.getElementById('volBar');
+    const volFill = document.getElementById('volFill');
 
-    function openVideo(index) {
-      const vid = videos[index];
-      player.src = vid.src;
-      caption.textContent = vid.name;
-      lightbox.classList.add('open');
-      document.body.style.overflow = 'hidden';
-      player.play().catch(() => {});
+    let playing = false;
+    let prevVol = 0.7;
+
+    const SVG_PLAY = '<polygon points="6 3 20 12 6 21 6 3"/>';
+    const SVG_PAUSE = '<rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/>';
+    const SVG_VOL_HIGH = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+    const SVG_VOL_LOW = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>';
+    const SVG_VOL_MUTE = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0021 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 003.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+
+    function fmt(s) { if (isNaN(s)) return '0:00'; return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0'); }
+
+    function updatePlayIcon() {
+      iconPlay.innerHTML = playing ? SVG_PAUSE : SVG_PLAY;
+      btnPlay.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    }
+    function updateVolIcon() {
+      if (audio.volume === 0 || audio.muted) iconVol.innerHTML = SVG_VOL_MUTE;
+      else if (audio.volume < 0.5) iconVol.innerHTML = SVG_VOL_LOW;
+      else iconVol.innerHTML = SVG_VOL_HIGH;
     }
 
-    function closeVideo() {
-      lightbox.classList.remove('open');
-      document.body.style.overflow = '';
-      player.pause();
-      player.src = '';
-    }
-
-    gallery.addEventListener('click', (e) => {
-      const item = e.target.closest('.video-item');
-      if (item) {
-        openVideo(parseInt(item.dataset.index, 10));
-      }
+    btnPlay.addEventListener('click', () => {
+      if (audio.paused) { audio.play().then(() => { playing = true; updatePlayIcon(); }).catch(() => {}); }
+      else { audio.pause(); playing = false; updatePlayIcon(); }
     });
 
-    gallery.addEventListener('keydown', (e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.video-item')) {
-        e.preventDefault();
-        openVideo(parseInt(e.target.closest('.video-item').dataset.index, 10));
-      }
+    audio.addEventListener('timeupdate', () => {
+      const pct = (audio.currentTime / audio.duration) * 100 || 0;
+      seekFill.style.width = pct + '%'; seekThumb.style.left = pct + '%'; seekBar.value = (pct/100)*1000;
+      curTime.textContent = fmt(audio.currentTime);
+    });
+    audio.addEventListener('loadedmetadata', () => { durTime.textContent = fmt(audio.duration); });
+    audio.addEventListener('ended', () => { playing = false; updatePlayIcon(); });
+
+    seekBar.addEventListener('input', () => {
+      const pct = seekBar.value / 1000;
+      audio.currentTime = pct * audio.duration;
+      seekFill.style.width = (pct*100) + '%'; seekThumb.style.left = (pct*100) + '%';
+    });
+    volBar.addEventListener('input', () => {
+      const v = volBar.value / 100;
+      audio.volume = v; audio.muted = false; volFill.style.width = (v*100) + '%'; prevVol = v || prevVol; updateVolIcon();
+    });
+    btnMute.addEventListener('click', () => {
+      if (audio.muted || audio.volume === 0) {
+        audio.muted = false; audio.volume = prevVol || 0.7;
+        volBar.value = audio.volume * 100; volFill.style.width = (audio.volume*100) + '%';
+      } else { prevVol = audio.volume; audio.muted = true; volBar.value = 0; volFill.style.width = '0%'; }
+      updateVolIcon();
     });
 
-    closeBtn.addEventListener('click', closeVideo);
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeVideo();
-    });
+    audio.volume = 0.7;
+    const startMusic = () => {
+      audio.play().then(() => { playing = true; updatePlayIcon(); }).catch(() => {});
+      document.removeEventListener('click', startMusic); document.removeEventListener('keydown', startMusic);
+    };
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
 
-    document.addEventListener('keydown', (e) => {
-      if (!lightbox.classList.contains('open')) return;
-      if (e.key === 'Escape') closeVideo();
-    });
-
-    // Pause video when lightbox closes
-    lightbox.addEventListener('transitionend', (e) => {
-      if (e.propertyName === 'opacity' && !lightbox.classList.contains('open')) {
-        player.pause();
-      }
-    });
+    /* ---- Scroll Reveal ---- */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   </script>
 </body>
 </html>

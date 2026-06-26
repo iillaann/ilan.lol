@@ -1,161 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pics — ilan.lol</title>
+  <meta name="description" content="Photo gallery on ilan.lol — screenshots, memes, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <nav>
-    <a href="../index.html">Home</a>
-    <a href="index.html">Pics</a>
-    <a href="../vids/index.html">Vids</a>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">ilan.lol</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="index.html" class="active">Pics</a></li>
+      <li><a href="../vids/index.html">Vids</a></li>
+    </ul>
   </nav>
 
-  <audio id="bgm" src="../tuffbackgroundmusic.mp3" loop></audio>
-  <script>
-    const audio = document.getElementById('bgm');
-    const startMusic = () => {
-      audio.play().catch(() => {});
-      document.removeEventListener('click', startMusic);
-      document.removeEventListener('keydown', startMusic);
-    };
-    document.addEventListener('click', startMusic);
-    document.addEventListener('keydown', startMusic);
-  </script>
-
-  <div class="content">
+  <!-- Page Header -->
+  <div class="page-header">
     <h1>Pics</h1>
-    <p class="gallery-count" id="picCount">Loading...</p>
+    <p id="picCount">Loading…</p>
+  </div>
 
-    <div class="gallery" id="picGallery">
-      <!-- Images will be injected here -->
+  <!-- Gallery -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="gallery" id="picGallery"></div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview">
+    <button class="lightbox-close" id="lbClose" aria-label="Close">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lbPrev" aria-label="Previous image">‹</button>
+    <img class="lightbox-img" id="lbImg" src="" alt="">
+    <button class="lightbox-nav lightbox-next" id="lbNext" aria-label="Next image">›</button>
+    <div class="lightbox-counter" id="lbCounter"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 <a href="../index.html">ilan.lol</a></p>
+  </footer>
+
+  <!-- Music Player -->
+  <div class="player" id="player">
+    <div class="player-info">
+      <div class="player-note">♪</div>
+      <div class="player-meta">
+        <div class="player-song">Tuff Background Music</div>
+        <div class="player-artist">Unknown Artist</div>
+      </div>
+    </div>
+    <button class="player-play" id="btnPlay" aria-label="Play">
+      <svg id="iconPlay" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+    </button>
+    <div class="player-seek">
+      <span class="player-time" id="curTime">0:00</span>
+      <div class="seek-wrap" id="seekWrap">
+        <div class="seek-track">
+          <div class="seek-fill" id="seekFill"></div>
+        </div>
+        <div class="seek-thumb" id="seekThumb"></div>
+        <input type="range" class="seek-input" id="seekBar" min="0" max="1000" value="0" aria-label="Seek">
+      </div>
+      <span class="player-time" id="durTime">0:00</span>
+    </div>
+    <div class="player-vol">
+      <button class="player-mute" id="btnMute" aria-label="Mute">
+        <svg id="iconVol" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+      <div class="vol-wrap" id="volWrap">
+        <div class="vol-track">
+          <div class="vol-fill" id="volFill"></div>
+        </div>
+        <input type="range" class="vol-input" id="volBar" min="0" max="100" value="70" aria-label="Volume">
+      </div>
     </div>
   </div>
 
-  <!-- Lightbox Modal -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview">
-    <button class="lightbox-close" id="lightboxClose" aria-label="Close">×</button>
-    <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous">‹</button>
-    <img id="lightboxImg" src="" alt="" />
-    <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next">›</button>
-    <p class="lightbox-caption" id="lightboxCaption"></p>
-  </div>
+  <audio id="bgm" src="../tuffbackgroundmusic.mp3" loop preload="metadata"></audio>
 
   <script>
+    /* ---- Image Data ---- */
     const images = [
-      "pics/ezgif.com-animated-gif-maker.png",
-      "pics/Screenshot 2025-01-20 214150.png",
-      "pics/JPOSH.png",
-      "pics/sworn.png",
-      "pics/12.png",
-      "pics/me.gif",
-      "pics/2a890d87-fdb3-4a53-adfd-3d6c77e740a0.jpg",
-      "pics/boithistuff.png",
-      "pics/IMG_3102.PNG",
-      "pics/Screenshot 2026-05-10 010035.png",
-      "pics/5fbc16546a7f405eac5e0f38ff4ffae9~tplv-jj85edgx6n-image-medium.jpeg",
-      "pics/2b1d8d409ddc4de89ff8299c6f481172~tplv-f2jg4exsff-photo-comment-full.webp"
+      { src: "pics/ezgif.com-animated-gif-maker.png", alt: "Animated GIF" },
+      { src: "pics/Screenshot 2025-01-20 214150.png", alt: "Screenshot" },
+      { src: "pics/JPOSH.png", alt: "JPOSH" },
+      { src: "pics/sworn.png", alt: "Sworn" },
+      { src: "pics/12.png", alt: "12" },
+      { src: "pics/me.gif", alt: "Me" },
+      { src: "pics/2a890d87-fdb3-4a53-adfd-3d6c77e740a0.jpg", alt: "Photo" },
+      { src: "pics/boithistuff.png", alt: "Boi This Stuff" },
+      { src: "pics/IMG_3102.PNG", alt: "IMG 3102" },
+      { src: "pics/Screenshot 2026-05-10 010035.png", alt: "Screenshot" },
+      { src: "pics/5fbc16546a7f405eac5e0f38ff4ffae9~tplv-jj85edgx6n-image-medium.jpeg", alt: "Image" },
+      { src: "pics/2b1d8d409ddc4de89ff8299c6f481172~tplv-f2jg4exsff-photo-comment-full.webp", alt: "Photo comment" }
     ];
 
+    /* ---- Build Gallery ---- */
     const gallery = document.getElementById('picGallery');
     const countEl = document.getElementById('picCount');
-    let currentIndex = 0;
 
-    images.forEach((src, i) => {
-      const link = document.createElement('a');
-      link.href = src;
-      link.className = 'gallery-item';
-      link.dataset.index = i;
-      link.tabIndex = 0;
-      link.ariaLabel = `View image ${i + 1} of ${images.length}`;
+    images.forEach((img, i) => {
+      const item = document.createElement('a');
+      item.href = '#';
+      item.className = 'gallery-item reveal';
+      item.dataset.index = i;
+      item.tabIndex = 0;
+      item.setAttribute('aria-label', `View ${img.alt} (${i + 1} of ${images.length})`);
 
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = `Image ${i + 1}`;
-      img.loading = 'lazy';
-      link.appendChild(img);
+      const imgEl = document.createElement('img');
+      imgEl.src = img.src;
+      imgEl.alt = img.alt;
+      imgEl.loading = 'lazy';
+      item.appendChild(imgEl);
 
-      gallery.appendChild(link);
+      gallery.appendChild(item);
     });
 
     countEl.textContent = `${images.length} image${images.length !== 1 ? 's' : ''}`;
 
-    // Lightbox logic
+    /* ---- Lightbox ---- */
     const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightboxImg');
-    const lightboxCaption = document.getElementById('lightboxCaption');
-    const closeBtn = document.getElementById('lightboxClose');
-    const prevBtn = document.getElementById('lightboxPrev');
-    const nextBtn = document.getElementById('lightboxNext');
+    const lbImg = document.getElementById('lbImg');
+    const lbCounter = document.getElementById('lbCounter');
+    const lbClose = document.getElementById('lbClose');
+    const lbPrev = document.getElementById('lbPrev');
+    const lbNext = document.getElementById('lbNext');
+    let curIdx = 0;
 
-    function openLightbox(index) {
-      currentIndex = index;
-      lightboxImg.src = images[currentIndex];
-      lightboxImg.alt = `Image ${currentIndex + 1} of ${images.length}`;
-      lightboxCaption.textContent = `${currentIndex + 1} / ${images.length}`;
+    function openLB(idx) {
+      curIdx = idx;
+      lbImg.src = images[idx].src;
+      lbImg.alt = images[idx].alt;
+      lbCounter.textContent = `${idx + 1} / ${images.length}`;
       lightbox.classList.add('open');
       document.body.style.overflow = 'hidden';
-      lightboxImg.focus();
     }
 
-    function closeLightbox() {
+    function closeLB() {
       lightbox.classList.remove('open');
       document.body.style.overflow = '';
-      lightboxImg.src = '';
     }
 
-    function navigate(dir) {
-      currentIndex = (currentIndex + dir + images.length) % images.length;
-      lightboxImg.src = images[currentIndex];
-      lightboxImg.alt = `Image ${currentIndex + 1} of ${images.length}`;
-      lightboxCaption.textContent = `${currentIndex + 1} / ${images.length}`;
+    function navLB(dir) {
+      curIdx = (curIdx + dir + images.length) % images.length;
+      lbImg.src = images[curIdx].src;
+      lbImg.alt = images[curIdx].alt;
+      lbCounter.textContent = `${curIdx + 1} / ${images.length}`;
     }
 
-    gallery.addEventListener('click', (e) => {
+    gallery.addEventListener('click', e => {
+      e.preventDefault();
       const item = e.target.closest('.gallery-item');
-      if (item) {
-        e.preventDefault();
-        openLightbox(parseInt(item.dataset.index, 10));
-      }
+      if (item) openLB(+item.dataset.index);
     });
 
-    gallery.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        const item = e.target.closest('.gallery-item');
-        if (item) {
-          e.preventDefault();
-          openLightbox(parseInt(item.dataset.index, 10));
-        }
-      }
-    });
+    lbClose.addEventListener('click', closeLB);
+    lbPrev.addEventListener('click', () => navLB(-1));
+    lbNext.addEventListener('click', () => navLB(1));
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLB(); });
 
-    closeBtn.addEventListener('click', closeLightbox);
-    prevBtn.addEventListener('click', () => navigate(-1));
-    nextBtn.addEventListener('click', () => navigate(1));
-
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeLightbox();
-    });
-
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
       if (!lightbox.classList.contains('open')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') navigate(-1);
-      if (e.key === 'ArrowRight') navigate(1);
+      if (e.key === 'Escape') closeLB();
+      if (e.key === 'ArrowLeft') navLB(-1);
+      if (e.key === 'ArrowRight') navLB(1);
     });
 
-    // Preload adjacent images for smoother navigation
-    function preloadAdjacent() {
-      const prev = (currentIndex - 1 + images.length) % images.length;
-      const next = (currentIndex + 1) % images.length;
-      [prev, next].forEach(i => {
-        const img = new Image();
-        img.src = images[i];
-      });
+    // Preload adjacent
+    lbImg.addEventListener('load', () => {
+      const p = (curIdx - 1 + images.length) % images.length;
+      const n = (curIdx + 1) % images.length;
+      [p, n].forEach(i => { const img = new Image(); img.src = images[i].src; });
+    });
+
+    /* ---- Music Player ---- */
+    const audio = document.getElementById('bgm');
+    const btnPlay = document.getElementById('btnPlay');
+    const iconPlay = document.getElementById('iconPlay');
+    const seekBar = document.getElementById('seekBar');
+    const seekFill = document.getElementById('seekFill');
+    const seekThumb = document.getElementById('seekThumb');
+    const curTime = document.getElementById('curTime');
+    const durTime = document.getElementById('durTime');
+    const btnMute = document.getElementById('btnMute');
+    const iconVol = document.getElementById('iconVol');
+    const volBar = document.getElementById('volBar');
+    const volFill = document.getElementById('volFill');
+
+    let playing = false;
+    let prevVol = 0.7;
+
+    const SVG_PLAY = '<polygon points="6 3 20 12 6 21 6 3"/>';
+    const SVG_PAUSE = '<rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/>';
+    const SVG_VOL_HIGH = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+    const SVG_VOL_LOW = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>';
+    const SVG_VOL_MUTE = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0021 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 003.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+
+    function fmt(s) { if (isNaN(s)) return '0:00'; return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0'); }
+
+    function updatePlayIcon() {
+      iconPlay.innerHTML = playing ? SVG_PAUSE : SVG_PLAY;
+      btnPlay.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     }
-    lightboxImg.addEventListener('load', preloadAdjacent);
+    function updateVolIcon() {
+      if (audio.volume === 0 || audio.muted) iconVol.innerHTML = SVG_VOL_MUTE;
+      else if (audio.volume < 0.5) iconVol.innerHTML = SVG_VOL_LOW;
+      else iconVol.innerHTML = SVG_VOL_HIGH;
+    }
+
+    btnPlay.addEventListener('click', () => {
+      if (audio.paused) { audio.play().then(() => { playing = true; updatePlayIcon(); }).catch(() => {}); }
+      else { audio.pause(); playing = false; updatePlayIcon(); }
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      const pct = (audio.currentTime / audio.duration) * 100 || 0;
+      seekFill.style.width = pct + '%'; seekThumb.style.left = pct + '%'; seekBar.value = (pct/100)*1000;
+      curTime.textContent = fmt(audio.currentTime);
+    });
+    audio.addEventListener('loadedmetadata', () => { durTime.textContent = fmt(audio.duration); });
+    audio.addEventListener('ended', () => { playing = false; updatePlayIcon(); });
+
+    seekBar.addEventListener('input', () => {
+      const pct = seekBar.value / 1000;
+      audio.currentTime = pct * audio.duration;
+      seekFill.style.width = (pct*100) + '%'; seekThumb.style.left = (pct*100) + '%';
+    });
+    volBar.addEventListener('input', () => {
+      const v = volBar.value / 100;
+      audio.volume = v; audio.muted = false; volFill.style.width = (v*100) + '%'; prevVol = v || prevVol; updateVolIcon();
+    });
+    btnMute.addEventListener('click', () => {
+      if (audio.muted || audio.volume === 0) {
+        audio.muted = false; audio.volume = prevVol || 0.7;
+        volBar.value = audio.volume * 100; volFill.style.width = (audio.volume*100) + '%';
+      } else { prevVol = audio.volume; audio.muted = true; volBar.value = 0; volFill.style.width = '0%'; }
+      updateVolIcon();
+    });
+
+    audio.volume = 0.7;
+    const startMusic = () => {
+      audio.play().then(() => { playing = true; updatePlayIcon(); }).catch(() => {});
+      document.removeEventListener('click', startMusic); document.removeEventListener('keydown', startMusic);
+    };
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
+
+    /* ---- Scroll Reveal ---- */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.05 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   </script>
 </body>
 </html>
