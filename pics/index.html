@@ -11,6 +11,9 @@
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
+  <video autoplay loop muted playsinline id="bg-video">
+    <source src="../background.mp4" type="video/mp4">
+  </video>
 
   <!-- Navigation -->
   <nav class="nav">
@@ -248,12 +251,19 @@
     });
 
     audio.volume = 0.7;
-    const startMusic = () => {
-      audio.play().then(() => { playing = true; updatePlayIcon(); }).catch(() => {});
-      document.removeEventListener('click', startMusic); document.removeEventListener('keydown', startMusic);
+
+    // Unmute background video on first interaction
+    const startVideoAudio = () => {
+      const bgVideo = document.getElementById('bg-video');
+      if (bgVideo) {
+        bgVideo.muted = false;
+        bgVideo.play().catch(() => {});
+      }
+      document.removeEventListener('click', startVideoAudio);
+      document.removeEventListener('keydown', startVideoAudio);
     };
-    document.addEventListener('click', startMusic);
-    document.addEventListener('keydown', startMusic);
+    document.addEventListener('click', startVideoAudio);
+    document.addEventListener('keydown', startVideoAudio);
 
     /* ---- Scroll Reveal ---- */
     const revealObserver = new IntersectionObserver((entries) => {
